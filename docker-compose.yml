@@ -1,0 +1,13 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: faxinei-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: docker
+      POSTGRES_DB: faxinei
+      PGDATA: /data/postgres
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./data/pg:/data/postgres # Salva os dados na sua pasta local para não perder nada
