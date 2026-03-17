@@ -6,46 +6,41 @@ import {
   Param,
   HttpCode,
   ConflictException,
+  Patch,
+  Put,
+  Delete,
 } from '@nestjs/common'
-import { PrismaService } from '@/prisma/prisma.service'
+import { PrismaService } from '../prisma/prisma.service'
+import { UsuarioService } from '@/services/usuario.service'
 
 @Controller('api/usuarios')
-export class CriarUsuarioController {
-  constructor(private prisma: PrismaService) {}
+export class UsuarioController {
+  constructor(
+    private prisma: PrismaService,
+    private usuarioService: UsuarioService,
+  ) {}
 
   @Get('listar')
   @HttpCode(200)
   async listar() {
-    try {
-      const usuarios = await this.prisma.usuario.findMany()
-      return usuarios
-    } catch (error) {
-      console.error('Erro ao listar usuários:', error)
-      throw error
-    }
+    return await this.usuarioService.listar()
   }
 
   @Post('criar')
   @HttpCode(201)
   async criar(@Body() body: any) {
-    try {
-      const { nome, email, senha } = body
+    return await this.usuarioService.criar(body)
+  }
 
-      const usuarioExistente = await this.prisma.usuario.findUnique({
-        where: { email },
-      })
+  @Put('atualizar/:id')
+  @HttpCode(200)
+  async atualizar(@Body() body: any, @Param('id') id: string) {
+    return await this.usuarioService.atualizar(id, body)
+  }
 
-      if (usuarioExistente) {
-        throw new ConflictException('Email já cadastrado')
-      }
-
-      const novoUsuario = await this.prisma.usuario.create({
-        data: { nome, email, senha },
-      })
-      return { message: 'Usuário criado com sucesso!', id: novoUsuario.id }
-    } catch (error) {
-      console.error('ERRO NO PRISMA:', error)
-      throw error
-    }
+  @Delete('remover/:id')
+  @HttpCode(200)
+  async remover(@Param('id') id: string) {
+    return await this.usuarioService.remover(id)
   }
 }
