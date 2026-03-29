@@ -13,7 +13,7 @@ export const atualizarUsuarioDto = z
     senha: z.string().min(6).optional(),
   })
   .refine((data) => Object.keys(data).length > 0, {
-    message: 'Informe ao menos um campo para atualização.',
+    message: 'Informe ao menos um campo para atualização',
   })
 
 export type CriarUsuarioDto = z.infer<typeof criarUsuarioDto>

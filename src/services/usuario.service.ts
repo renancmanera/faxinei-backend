@@ -3,6 +3,7 @@ import {
   ConflictException,
   NotFoundException,
   InternalServerErrorException,
+  HttpException,
 } from '@nestjs/common'
 import { PrismaService } from '@/prisma/prisma.service' // Ajuste o path conforme seu projeto
 import { hash } from 'bcryptjs'
@@ -21,6 +22,9 @@ export class UsuarioService {
       })
       return usuarios
     } catch (error) {
+      if (error instanceof HttpException) {
+        throw error
+      }
       throw new InternalServerErrorException('Erro ao listar usuários')
     }
   }
@@ -46,6 +50,9 @@ export class UsuarioService {
         email: body.email,
       }
     } catch (error) {
+      if (error instanceof HttpException) {
+        throw error
+      }
       throw new InternalServerErrorException('Erro ao criar usuário')
     }
   }
@@ -103,6 +110,9 @@ export class UsuarioService {
         email: usuarioAtualizado.email,
       }
     } catch (error) {
+      if (error instanceof HttpException) {
+        throw error
+      }
       throw new InternalServerErrorException('Erro ao atualizar usuário')
     }
   }
@@ -120,6 +130,9 @@ export class UsuarioService {
       })
       return { message: 'Usuário removido com sucesso!' }
     } catch (error) {
+      if (error instanceof HttpException) {
+        throw error
+      }
       throw new InternalServerErrorException('Erro ao remover usuário')
     }
   }
