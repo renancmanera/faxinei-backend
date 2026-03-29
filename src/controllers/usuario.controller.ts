@@ -7,9 +7,10 @@ import {
   HttpCode,
   Put,
   Delete,
+  BadRequestException,
 } from '@nestjs/common'
 import { UsuarioService } from '@/services/usuario.service'
-import { CriarUsuarioDto, AtualizarUsuarioDto } from '@/dto/usuario.dto'
+import { criarUsuarioDto, atualizarUsuarioDto } from '@/dto/usuario.dto'
 
 @Controller('api/usuarios')
 export class UsuarioController {
@@ -23,14 +24,16 @@ export class UsuarioController {
 
   @Post('criar')
   @HttpCode(201)
-  async criar(@Body() body: CriarUsuarioDto) {
-    return await this.usuarioService.criar(body)
+  async criar(@Body() body: unknown) {
+    const bodyValidado = criarUsuarioDto.parse(body)
+    return await this.usuarioService.criar(bodyValidado)
   }
 
   @Put('atualizar/:id')
   @HttpCode(200)
-  async atualizar(@Body() body: AtualizarUsuarioDto, @Param('id') id: string) {
-    return await this.usuarioService.atualizar(id, body)
+  async atualizar(@Body() body: unknown, @Param('id') id: string) {
+    const bodyValidado = atualizarUsuarioDto.parse(body)
+    return await this.usuarioService.atualizar(id, bodyValidado)
   }
 
   @Delete('remover/:id')
