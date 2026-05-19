@@ -29,6 +29,7 @@ export class UsuarioService {
         nome: dados.nome,
         email: dados.email,
         senha: senhaCriptografada,
+        papel: dados.role,
       },
     })
     return {
@@ -36,6 +37,7 @@ export class UsuarioService {
       id: novoUsuario.id,
       nome: dados.nome,
       email: dados.email,
+      role: novoUsuario.papel,
     }
   }
 

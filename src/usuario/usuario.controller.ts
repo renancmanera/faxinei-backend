@@ -8,6 +8,7 @@ import {
   Put,
   Delete,
   UseGuards,
+  ForbiddenException,
 } from '@nestjs/common'
 import { AuthGuard } from '@nestjs/passport'
 import { UsuarioService } from '@/usuario/usuario.service'
@@ -18,6 +19,9 @@ import {
   AtualizarUsuarioDto,
 } from '@/usuario/usuario.dto'
 import { ZodValidationPipe } from '@/pipes/zod-validation.pipe'
+import { RoleGuard } from '@/auth/guards/role.guard'
+import { UsuarioAtual } from '@/auth/decorators/usuario-atual.decorator'
+import type { UsuarioAutenticado } from '@/auth/types/usuario-autenticado'
 
 @Controller('api/usuarios')
 export class UsuarioController {
@@ -25,13 +29,13 @@ export class UsuarioController {
 
   @Get('listar')
   @HttpCode(200)
+  @UseGuards(AuthGuard('jwt'), RoleGuard)
   async listar() {
     return await this.usuarioService.listar()
   }
 
   @Post('criar')
   @HttpCode(201)
-  @UseGuards(AuthGuard('jwt'))
   async criar(
     @Body(new ZodValidationPipe(criarUsuarioDto)) body: CriarUsuarioDto,
   ) {
@@ -40,19 +44,29 @@ export class UsuarioController {
 
   @Put('atualizar/:id')
   @HttpCode(200)
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RoleGuard)
   async atualizar(
+    @Param('id') id: string,
+    @UsuarioAtual() user: UsuarioAutenticado,
     @Body(new ZodValidationPipe(atualizarUsuarioDto))
     body: AtualizarUsuarioDto,
-    @Param('id') id: string,
   ) {
+    if (user.idUsuario !== id) {
+      throw new ForbiddenException('Você só pode atualizar seu próprio perfil')
+    }
     return await this.usuarioService.atualizar(id, body)
   }
 
   @Delete('remover/:id')
   @HttpCode(200)
-  @UseGuards(AuthGuard('jwt'))
-  async remover(@Param('id') id: string) {
+  @UseGuards(AuthGuard('jwt'), RoleGuard)
+  async remover(
+    @Param('id') id: string,
+    @UsuarioAtual() user: UsuarioAutenticado,
+  ) {
+    if (user.idUsuario !== id) {
+      throw new ForbiddenException('Você só pode remover seu próprio perfil')
+    }
     return await this.usuarioService.remover(id)
   }
 }

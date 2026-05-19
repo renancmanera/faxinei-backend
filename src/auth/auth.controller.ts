@@ -1,6 +1,6 @@
 import { Controller, Post, Body, HttpCode } from '@nestjs/common'
 import { AuthService } from '@/auth/auth.service'
-import { loginDto, LoginDto } from '@/auth/auth.dto'
+import { loginUsuarioDto, LoginUsuarioDto } from '@/auth/auth.dto'
 import { ZodValidationPipe } from '@/pipes/zod-validation.pipe'
 
 @Controller('api/auth')
@@ -9,9 +9,7 @@ export class AuthController {
 
   @Post('login')
   @HttpCode(200)
-  async login(
-    @Body(new ZodValidationPipe(loginDto)) body: LoginDto,
-  ) {
+  async login(@Body(new ZodValidationPipe(loginUsuarioDto)) body: LoginUsuarioDto) {
     return this.authService.login(body)
   }
 }

@@ -6,11 +6,17 @@ datasource db {
   provider = "postgresql"
 }
 
+enum Papel {
+  CLIENTE
+  DIARISTA
+}
+
 model Usuario {
   id           String    @id @default(uuid())
   email        String    @unique
   nome         String
   senha        String
+  papel        Papel     @default(CLIENTE)
   criadoEm     DateTime  @default(now())
   atualizadoEm DateTime? @updatedAt
   ativo        Boolean   @default(true)
