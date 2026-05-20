@@ -1,14 +1,14 @@
 import { z } from 'zod'
 
-export const roleUsuarioEnum = z.enum(['CLIENTE', 'DIARISTA'], {
-  message: 'Role deve ser CLIENTE ou DIARISTA',
+export const papelUsuarioEnum = z.enum(['CLIENTE', 'DIARISTA'], {
+  message: 'Papel deve ser CLIENTE ou DIARISTA',
 })
 
 export const criarUsuarioDto = z.object({
   nome: z.string().min(3, 'O nome deve ter pelo menos 3 caracteres'),
   email: z.string().email('Formato de e-mail inválido'),
   senha: z.string().min(6, 'A senha deve ter pelo menos 6 caracteres'),
-  role: roleUsuarioEnum,
+  papel: papelUsuarioEnum,
 })
 
 export const atualizarUsuarioDto = z

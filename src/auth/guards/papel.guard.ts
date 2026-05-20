@@ -5,36 +5,36 @@ import {
   Injectable,
 } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
-import { ROLES_KEY } from '@/auth/decorators/role.decorator'
+import { PAPEIS_KEY } from '@/auth/decorators/papel.decorator'
 import type {
   UsuarioAutenticado,
-  RoleUsuario,
+  PapelUsuario,
 } from '@/auth/types/usuario-autenticado'
 
 @Injectable()
-export class RoleGuard implements CanActivate {
-  constructor(private reflector: Reflector) {}
+export class PapelGuard implements CanActivate {
+  constructor(private reflector: Reflector) { }
 
   canActivate(context: ExecutionContext): boolean {
-    const roles = this.reflector.getAllAndOverride<RoleUsuario[]>(ROLES_KEY, [
+    const papeis = this.reflector.getAllAndOverride<PapelUsuario[]>(PAPEIS_KEY, [
       context.getHandler(),
       context.getClass(),
     ])
 
-    if (!roles?.length) {
+    if (!papeis?.length) {
       return true
     }
 
     const request = context
       .switchToHttp()
-      .getRequest<{ user?: UsuarioAutenticado }>()
-    const user = request.user
+      .getRequest<{ usuario?: UsuarioAutenticado }>()
+    const usuario = request.usuario
 
-    if (!user?.role) {
+    if (!usuario?.papel) {
       throw new ForbiddenException('Acesso negado')
     }
 
-    if (!roles.includes(user.role)) {
+    if (!papeis.includes(usuario.papel)) {
       throw new ForbiddenException('Você não tem permissão para esta ação')
     }
 

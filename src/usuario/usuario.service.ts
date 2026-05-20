@@ -3,20 +3,16 @@ import {
   ConflictException,
   NotFoundException,
 } from '@nestjs/common'
-import { PrismaService } from '@/prisma/prisma.service'
 import { hash, compare } from 'bcryptjs'
 import { AtualizarUsuarioDto, CriarUsuarioDto } from '@/usuario/usuario.dto'
+import { UsuarioRepository } from '@/usuario/usuario.repository'
 
 @Injectable()
 export class UsuarioService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private usuarioRepository: UsuarioRepository) { }
 
   async listar() {
-    return await this.prisma.usuario.findMany({
-      omit: {
-        senha: true,
-      },
-    })
+    return await this.usuarioRepository.listar()
   }
 
   async criar(dados: CriarUsuarioDto) {
@@ -24,20 +20,18 @@ export class UsuarioService {
 
     const senhaCriptografada = await hash(dados.senha, 8)
 
-    const novoUsuario = await this.prisma.usuario.create({
-      data: {
-        nome: dados.nome,
-        email: dados.email,
-        senha: senhaCriptografada,
-        papel: dados.role,
-      },
+    const novoUsuario = await this.usuarioRepository.criar({
+      nome: dados.nome,
+      email: dados.email,
+      senha: senhaCriptografada,
+      papel: dados.papel,
     })
     return {
       message: 'Usuário criado com sucesso!',
       id: novoUsuario.id,
       nome: dados.nome,
       email: dados.email,
-      role: novoUsuario.papel,
+      papel: novoUsuario.papel,
     }
   }
 
@@ -60,10 +54,10 @@ export class UsuarioService {
       }
     }
 
-    const usuarioAtualizado = await this.prisma.usuario.update({
-      where: { id },
-      data: dadosParaAtualizar,
-    })
+    const usuarioAtualizado = await this.usuarioRepository.atualizar(
+      id,
+      dadosParaAtualizar,
+    )
     return {
       message: 'Usuário atualizado com sucesso!',
       id: usuarioAtualizado.id,
@@ -74,14 +68,12 @@ export class UsuarioService {
 
   async remover(id: string) {
     await this.buscarUsuarioOuFalhar(id)
-    await this.prisma.usuario.delete({ where: { id } })
+    await this.usuarioRepository.remover(id)
     return { message: 'Usuário removido com sucesso!' }
   }
 
-  // --- Métodos privados ---
-
   private async buscarUsuarioOuFalhar(id: string) {
-    const usuario = await this.prisma.usuario.findUnique({ where: { id } })
+    const usuario = await this.usuarioRepository.buscarPorId(id)
     if (!usuario) {
       throw new NotFoundException('Usuário não encontrado')
     }
@@ -89,9 +81,7 @@ export class UsuarioService {
   }
 
   private async verificarEmailDisponivel(email: string, idExcluir?: string) {
-    const usuarioExistente = await this.prisma.usuario.findUnique({
-      where: { email },
-    })
+    const usuarioExistente = await this.usuarioRepository.buscarPorEmail(email)
     if (usuarioExistente && usuarioExistente.id !== idExcluir) {
       throw new ConflictException(
         idExcluir

@@ -19,17 +19,17 @@ import {
   AtualizarUsuarioDto,
 } from '@/usuario/usuario.dto'
 import { ZodValidationPipe } from '@/pipes/zod-validation.pipe'
-import { RoleGuard } from '@/auth/guards/role.guard'
+import { PapelGuard } from '@/auth/guards/papel.guard'
 import { UsuarioAtual } from '@/auth/decorators/usuario-atual.decorator'
 import type { UsuarioAutenticado } from '@/auth/types/usuario-autenticado'
 
 @Controller('api/usuarios')
 export class UsuarioController {
-  constructor(private usuarioService: UsuarioService) {}
+  constructor(private usuarioService: UsuarioService) { }
 
   @Get('listar')
   @HttpCode(200)
-  @UseGuards(AuthGuard('jwt'), RoleGuard)
+  //@UseGuards(AuthGuard('jwt'), PapelGuard)
   async listar() {
     return await this.usuarioService.listar()
   }
@@ -44,14 +44,14 @@ export class UsuarioController {
 
   @Put('atualizar/:id')
   @HttpCode(200)
-  @UseGuards(AuthGuard('jwt'), RoleGuard)
+  //@UseGuards(AuthGuard('jwt'), PapelGuard)
   async atualizar(
     @Param('id') id: string,
-    @UsuarioAtual() user: UsuarioAutenticado,
+    @UsuarioAtual() usuario: UsuarioAutenticado,
     @Body(new ZodValidationPipe(atualizarUsuarioDto))
     body: AtualizarUsuarioDto,
   ) {
-    if (user.idUsuario !== id) {
+    if (usuario.idUsuario !== id) {
       throw new ForbiddenException('Você só pode atualizar seu próprio perfil')
     }
     return await this.usuarioService.atualizar(id, body)
@@ -59,12 +59,12 @@ export class UsuarioController {
 
   @Delete('remover/:id')
   @HttpCode(200)
-  @UseGuards(AuthGuard('jwt'), RoleGuard)
+  @UseGuards(AuthGuard('jwt'), PapelGuard)
   async remover(
     @Param('id') id: string,
-    @UsuarioAtual() user: UsuarioAutenticado,
+    @UsuarioAtual() usuario: UsuarioAutenticado,
   ) {
-    if (user.idUsuario !== id) {
+    if (usuario.idUsuario !== id) {
       throw new ForbiddenException('Você só pode remover seu próprio perfil')
     }
     return await this.usuarioService.remover(id)

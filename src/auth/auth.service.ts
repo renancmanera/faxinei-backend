@@ -37,7 +37,7 @@ export class AuthService {
     const payload = {
       sub: usuario.id,
       email: usuario.email,
-      role: usuario.papel,
+      papel: usuario.papel,
     }
 
     return {
@@ -46,7 +46,7 @@ export class AuthService {
         id: usuario.id,
         nome: usuario.nome,
         email: usuario.email,
-        role: usuario.papel,
+        papel: usuario.papel,
       },
     }
   }

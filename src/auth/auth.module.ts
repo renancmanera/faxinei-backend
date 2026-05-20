@@ -5,7 +5,7 @@ import { ConfigService } from '@nestjs/config'
 import { AuthService } from '@/auth/auth.service'
 import { AuthController } from '@/auth/auth.controller'
 import { JwtStrategy } from '@/auth/jwt.strategy'
-import { RoleGuard } from '@/auth/guards/role.guard'
+import { PapelGuard } from '@/auth/guards/papel.guard'
 import type { Env } from '@/config/env'
 import type { StringValue } from 'ms'
 
@@ -23,7 +23,7 @@ import type { StringValue } from 'ms'
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, RoleGuard],
-  exports: [PassportModule, JwtModule, RoleGuard],
+  providers: [AuthService, JwtStrategy, PapelGuard],
+  exports: [PassportModule, JwtModule, PapelGuard],
 })
-export class AuthModule {}
+export class AuthModule { }
